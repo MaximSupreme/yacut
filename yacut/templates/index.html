@@ -1,23 +1,42 @@
-<!DOCTYPE html>
-<html lang="ru">
+{% extends "base.html" %}
 
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="{{ url_for('static', filename='img/fav/fav.ico') }}" type="image" />
-        
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/fav/apple-touch-icon.png') }}" />
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/fav/favicon-32x32.png') }}" />
-        <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/fav/favicon-16x16.png') }}" />
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
-        <title>YaCut - укоротитель ссылок</title>
-    </head>
-    <body>
-      {% include "header.html" %}
-      {% block content %}{% endblock content %}
-      {% include "footer.html" %}
-    </body>
-    <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-
-</html>
+{% block content %}
+<section class="container my-5 px-4">
+    <h1 class="text-center"><span style="color:red">Ya</span>Cut</h1>
+    <p class="text-center my-4">
+        Создайте короткую ссылку автоматически или предложите свой вариант
+    </p>
+    
+    <div class="container">
+        <div class="row my-3">
+            <div class="col-sm"></div>
+            <div class="col-sm">
+                <form method="POST" novalidate>
+                    {{ form.csrf_token }}
+                    
+                    <div class="form-group">
+                        {{ form.original_link(class="form-control form-control-lg py-2 mb-3", placeholder="Длинная ссылка") }}
+                        {% if form.original_link.errors %}
+                            {% for error in form.original_link.errors %}
+                                <p><span style="color: red">{{ error }}</span></p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", placeholder="Ваш вариант короткой ссылки") }}
+                        {% if form.custom_id.errors %}
+                            {% for error in form.custom_id.errors %}
+                                <p><span style="color: red">{{ error }}</span></p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    {{ form.submit(class="btn btn-primary") }}
+                </form>
+            </div>
+            <div class="col-sm"></div>
+        </div>
+    </div>
+</section>
+{% endblock %}

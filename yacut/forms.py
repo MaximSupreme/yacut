@@ -16,7 +16,7 @@ class URLForm(FlaskForm):
     custom_id = StringField(
         'Ваш вариант короткой ссылки',
         validators=[
-            Length(max=SHORT_ID_MAX_LENGTH),
+            Length(max=SHORT_ID_MAX_LENGTH, message='Не более 16 символов.'),
             Regexp(
                 SHORT_ID_REGEX,
                 message=(
