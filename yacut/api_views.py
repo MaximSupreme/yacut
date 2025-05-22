@@ -15,12 +15,14 @@ def create_url():
         raise InvalidAPIUsage(
             'Неверный Content-Type: ожидается application/json'
         )
+    if not request.data:
+        raise InvalidAPIUsage('Отсутствует тело запроса', 400)
     try:
-        data = request.get_json(force=True)
-    except Exception as e:
-        data = None
+        data = request.get_json()
+    except Exception:
+        raise InvalidAPIUsage('Неверный формат JSON', 400)
     if data is None:
-        raise InvalidAPIUsage('Отсутствует тело запроса')
+        raise InvalidAPIUsage('Отсутствует тело запроса', 400)
     original_url = data.get('url')
     custom_id = data.get('custom_id')
     if not original_url:
