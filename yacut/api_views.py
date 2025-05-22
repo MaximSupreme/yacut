@@ -11,10 +11,25 @@ from .constants import SHORT_ID_MAX_LENGTH, SHORT_ID_REGEX
 
 @app.route('/api/id/', methods=['POST'])
 def create_url():
+    _validate_request()
+    data = _get_json_data()
+    original_url, custom_id = _extract_url_data(data)
+    short_id = _process_custom_id(custom_id) if custom_id else generate_short_url()
+    url_map = URLMap(original=original_url, short=short_id)
+    db.session.add(url_map)
+    db.session.commit()
+    return jsonify({
+        'url': original_url,
+        'short_link': url_for('redirect_to_original', short_id=short_id, _external=True)
+    }), 201
+
+
+def _validate_request():
     if request.content_type != 'application/json':
-        raise InvalidAPIUsage(
-            'Неверный Content-Type: ожидается application/json'
-        )
+        raise InvalidAPIUsage('Неверный Content-Type: ожидается application/json')
+
+
+def _get_json_data():
     if not request.data:
         raise InvalidAPIUsage('Отсутствует тело запроса', 400)
     try:
@@ -23,37 +38,24 @@ def create_url():
         raise InvalidAPIUsage('Неверный формат JSON', 400)
     if data is None:
         raise InvalidAPIUsage('Отсутствует тело запроса', 400)
+    return data
+
+
+def _extract_url_data(data):
     original_url = data.get('url')
-    custom_id = data.get('custom_id')
     if not original_url:
-        raise InvalidAPIUsage(
-            '"url" является обязательным полем!'
-        )
-    if custom_id:
-        if len(custom_id) > SHORT_ID_MAX_LENGTH:
-            raise InvalidAPIUsage(
-                'Указано недопустимое имя для короткой ссылки'
-            )
-        if not re.match(SHORT_ID_REGEX, custom_id):
-            raise InvalidAPIUsage(
-                'Указано недопустимое имя для короткой ссылки'
-            )
-        if URLMap.query.filter_by(short=custom_id).first():
-            raise InvalidAPIUsage(
-                'Предложенный вариант короткой ссылки уже существует.'
-            )
-        short_id = custom_id
-    else:
-        short_id = generate_short_url()
-    url_map = URLMap(original=original_url, short=short_id)
-    db.session.add(url_map)
-    db.session.commit()
-    return jsonify({
-        'url': original_url,
-        'short_link': url_for(
-            'redirect_to_original', short_id=short_id, _external=True
-        )
-    }), 201
+        raise InvalidAPIUsage('"url" является обязательным полем!')
+    return original_url, data.get('custom_id')
+
+
+def _process_custom_id(custom_id):
+    if len(custom_id) > SHORT_ID_MAX_LENGTH:
+        raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки')
+    if not re.match(SHORT_ID_REGEX, custom_id):
+        raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки')
+    if URLMap.query.filter_by(short=custom_id).first():
+        raise InvalidAPIUsage('Предложенный вариант короткой ссылки уже существует.')
+    return custom_id
 
 
 @app.route('/api/id/<short_id>/', methods=['GET'])
