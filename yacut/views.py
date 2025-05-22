@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for
 
 from . import app, db
 from .forms import URLForm
@@ -14,7 +14,9 @@ def main_page():
         custom_id = form.custom_id.data
         if custom_id:
             if URLMap.query.filter_by(short=custom_id).first():
-                flash('Предложенный вариант короткой ссылки уже существует.')
+                flash(
+                    'Предложенный вариант короткой ссылки уже существует.'
+                )
                 return render_template('base.html', form=form)
             short_id = custom_id
         else:
@@ -24,11 +26,17 @@ def main_page():
         )
         db.session.add(url_map)
         db.session.commit()
-        short_url = url_for('redirect_to_original', short_id=short_id, _external=True)
-        flash(f'Ваша новая ссылка: <a href="{short_url}">{short_url}</a>', 'success')
+        short_url = url_for(
+            'redirect_to_original', short_id=short_id, _external=True
+        )
+        flash(
+            f'Ваша новая ссылка: <a href="{short_url}">{short_url}</a>', 'success'
+        )
     for field, errors in form.errors.items():
         for error in errors:
-            flash(f'Ошибка в поле {getattr(form, field).label.text}: {error}', 'danger')
+            flash(
+                f'Ошибка в поле {getattr(form, field).label.text}: {error}', 'danger'
+            )
     
     return render_template('index.html', form=form)
 
