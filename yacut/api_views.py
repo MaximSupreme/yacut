@@ -17,7 +17,7 @@ def create_url():
         )
     try:
         data = request.get_json(force=True)
-    except:
+    except Exception as e:
         data = None
     if data is None:
         raise InvalidAPIUsage('Отсутствует тело запроса')

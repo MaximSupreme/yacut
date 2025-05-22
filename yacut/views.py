@@ -30,14 +30,13 @@ def main_page():
             'redirect_to_original', short_id=short_id, _external=True
         )
         flash(
-            f'Ваша новая ссылка: <a href="{short_url}">{short_url}</a>', 'success'
+            f'Ваша новая ссылка: <a href="{short_url}">{short_url}</a>',
         )
     for field, errors in form.errors.items():
         for error in errors:
             flash(
-                f'Ошибка в поле {getattr(form, field).label.text}: {error}', 'danger'
+                f'Ошибка в поле {getattr(form, field).label.text}: {error}',
             )
-    
     return render_template('index.html', form=form)
 
 

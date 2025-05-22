@@ -3,6 +3,7 @@ import string
 
 from .models import URLMap
 
+
 def generate_short_url(length=6):
     letters = string.ascii_letters + string.digits
     while True:
