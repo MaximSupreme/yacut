@@ -11,7 +11,7 @@
     <title>{% block title %}YaCut - укоротитель ссылок{% endblock %}</title>
 </head>
 <body>
-    {% include "header.html" %}
+    {% include "includes/header.html" %}
     <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -24,7 +24,7 @@
         {% endwith %}
         {% block content %}{% endblock %}
     </main>
-    {% include "footer.html" %}
+    {% include "includes/footer.html" %}
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 </body>
